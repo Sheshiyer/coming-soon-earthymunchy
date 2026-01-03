@@ -1,0 +1,16 @@
+.physics-btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background-color: var(--color-accent);
+    color: #000;
+    font-weight: 500;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    /* Reset default button styles */
+    appearance: none;
+    -webkit-appearance: none;
+}

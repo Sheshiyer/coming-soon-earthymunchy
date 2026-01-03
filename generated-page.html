@@ -1,0 +1,901 @@
+<html lang="en" class="bg-[#030303]"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulseBoard Agency | Global</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- GSAP & ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<!-- Lenis (Smooth Scroll) -->
+<script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<style>
+:root {
+--cursor-size: 20px;
+}
+body {
+font-family: 'Manrope', sans-serif;
+background-color: #030303;
+color: #ffffff;
+cursor: none;
+overflow-x: hidden;
+margin: 0;
+}
+/* --- CUSTOM CURSOR --- */
+#cursor {
+position: fixed;
+top: 0; left: 0;
+width: var(--cursor-size); height: var(--cursor-size);
+border: 1px solid rgba(255, 255, 255, 0.5);
+border-radius: 50%;
+pointer-events: none;
+z-index: 9999;
+transform: translate(-50%, -50%);
+transition: width 0.3s, height 0.3s, background-color 0.3s;
+mix-blend-mode: difference;
+}
+#cursor.hovered {
+width: 50px; height: 50px;
+background-color: white;
+border-color: transparent;
+mix-blend-mode: exclusion;
+}
+#cursor.view-cursor {
+width: 80px; height: 80px;
+background-color: rgba(255,255,255,0.1);
+backdrop-filter: blur(2px);
+border-color: rgba(255,255,255,0.2);
+display: flex; align-items: center; justify-content: center;
+}
+#cursor.view-cursor::after {
+content: 'VIEW';
+font-size: 10px; font-weight: 700; color: white;
+letter-spacing: 1px;
+}
+/* --- TYPOGRAPHY --- */
+.font-display { font-family: 'Space Grotesk', sans-serif; }
+/* --- UTILITIES --- */
+.glass {
+background: rgba(255, 255, 255, 0.03);
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.grayscale-img {
+filter: grayscale(100%);
+transition: filter 0.5s ease, transform 0.7s ease;
+}
+.group:hover .grayscale-img {
+filter: grayscale(0%);
+transform: scale(1.05);
+}
+/* --- 3D ANIMATIONS --- */
+.card-3d-wrap { perspective: 1000px; }
+.card-3d-inner {
+transform-style: preserve-3d;
+transition: transform 0.5s;
+}
+.card-element { transform: translateZ(40px); }
+/* --- MASK REVEAL --- */
+.mask-text { overflow: hidden; display: block; }
+.mask-text span {
+display: block;
+transform: translateY(110%);
+will-change: transform;
+}
+/* --- NOISE TEXTURE --- */
+.bg-noise {
+background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+/* --- NEW ANIMATIONS FOR CARDS --- */
+@keyframes scan-line {
+0% { top: 0%; opacity: 0; }
+10% { opacity: 1; }
+90% { opacity: 1; }
+100% { top: 100%; opacity: 0; }
+}
+.animate-scan {
+animation: scan-line 3s linear infinite;
+}
+@keyframes code-type {
+0% { width: 0; }
+50% { width: 70%; }
+100% { width: 70%; }
+}
+.animate-type {
+animation: code-type 2s steps(20, end) infinite alternate;
+}
+</style>
+<script>
+// Configure Tailwind to include our custom 3D transform utilities
+tailwind.config = {
+theme: {
+extend: {
+// Add any custom theme extensions here if needed
+}
+},
+plugins: [
+function({ addUtilities }) {
+const rotateXUtilities = {};
+const rotateYUtilities = {};
+const rotateZUtilities = {};
+const rotateValues = [0, 5, 10, 15, 20, 30, 45, 75];
+// Generate rotate-x utilities
+rotateValues.forEach((value) => {
+rotateXUtilities[`.rotate-x-${value}`] = {
+'--tw-rotate-x': `${value}deg`,
+transform: `
+translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0))
+rotateX(var(--tw-rotate-x, 0))
+rotateY(var(--tw-rotate-y, 0))
+rotateZ(var(--tw-rotate-z, 0))
+skewX(var(--tw-skew-x, 0))
+skewY(var(--tw-skew-y, 0))
+scaleX(var(--tw-scale-x, 1))
+scaleY(var(--tw-scale-y, 1))
+`.replace(/\\s+/g, ' ').trim(),
+};
+if (value !== 0) {
+rotateXUtilities[`.-rotate-x-${value}`] = {
+'--tw-rotate-x': `-${value}deg`,
+transform: `
+translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0))
+rotateX(var(--tw-rotate-x, 0))
+rotateY(var(--tw-rotate-y, 0))
+rotateZ(var(--tw-rotate-z, 0))
+skewX(var(--tw-skew-x, 0))
+skewY(var(--tw-skew-y, 0))
+scaleX(var(--tw-scale-x, 1))
+scaleY(var(--tw-scale-y, 1))
+`.replace(/\\s+/g, ' ').trim(),
+};
+}
+});
+// Generate rotate-y utilities
+rotateValues.forEach((value) => {
+rotateYUtilities[`.rotate-y-${value}`] = {
+'--tw-rotate-y': `${value}deg`,
+transform: `
+translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0))
+rotateX(var(--tw-rotate-x, 0))
+rotateY(var(--tw-rotate-y, 0))
+rotateZ(var(--tw-rotate-z, 0))
+skewX(var(--tw-skew-x, 0))
+skewY(var(--tw-skew-y, 0))
+scaleX(var(--tw-scale-x, 1))
+scaleY(var(--tw-scale-y, 1))
+`.replace(/\\s+/g, ' ').trim(),
+};
+if (value !== 0) {
+rotateYUtilities[`.-rotate-y-${value}`] = {
+'--tw-rotate-y': `-${value}deg`,
+transform: `
+translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0))
+rotateX(var(--tw-rotate-x, 0))
+rotateY(var(--tw-rotate-y, 0))
+rotateZ(var(--tw-rotate-z, 0))
+skewX(var(--tw-skew-x, 0))
+skewY(var(--tw-skew-y, 0))
+scaleX(var(--tw-scale-x, 1))
+scaleY(var(--tw-scale-y, 1))
+`.replace(/\\s+/g, ' ').trim(),
+};
+}
+});
+// Generate rotate-z utilities
+rotateValues.forEach((value) => {
+rotateZUtilities[`.rotate-z-${value}`] = {
+'--tw-rotate-z': `${value}deg`,
+transform: `
+translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0))
+rotateX(var(--tw-rotate-x, 0))
+rotateY(var(--tw-rotate-y, 0))
+rotateZ(var(--tw-rotate-z, 0))
+skewX(var(--tw-skew-x, 0))
+skewY(var(--tw-skew-y, 0))
+scaleX(var(--tw-scale-x, 1))
+scaleY(var(--tw-scale-y, 1))
+`.replace(/\\s+/g, ' ').trim(),
+};
+if (value !== 0) {
+rotateZUtilities[`.-rotate-z-${value}`] = {
+'--tw-rotate-z': `-${value}deg`,
+transform: `
+translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), var(--tw-translate-z, 0))
+rotateX(var(--tw-rotate-x, 0))
+rotateY(var(--tw-rotate-y, 0))
+rotateZ(var(--tw-rotate-z, 0))
+skewX(var(--tw-skew-x, 0))
+skewY(var(--tw-skew-y, 0))
+scaleX(var(--tw-scale-x, 1))
+scaleY(var(--tw-scale-y, 1))
+`.replace(/\\s+/g, ' ').trim(),
+};
+}
+});
+// Perspective utilities
+const perspectiveUtilities = {
+".perspective-none": { perspective: "none" },
+".perspective-dramatic": { perspective: "100px" },
+".perspective-near": { perspective: "300px" },
+".perspective-normal": { perspective: "500px" },
+".perspective-midrange": { perspective: "800px" },
+".perspective-distant": { perspective: "1200px" },
+};
+// Transform style utilities
+const transformStyleUtilities = {
+".transform-style-preserve-3d": { "transform-style": "preserve-3d" },
+".transform-style-flat": { "transform-style": "flat" },
+};
+addUtilities({
+...rotateXUtilities,
+...rotateYUtilities,
+...rotateZUtilities,
+...perspectiveUtilities,
+...transformStyleUtilities,
+});
+}
+]
+};
+</script><link id="all-fonts-link-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist">.font-geist { font-family: 'Geist', sans-serif !important; }</style><link id="all-fonts-link-font-roboto" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-roboto">.font-roboto { font-family: 'Roboto', sans-serif !important; }</style><link id="all-fonts-link-font-montserrat" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-montserrat">.font-montserrat { font-family: 'Montserrat', sans-serif !important; }</style><link id="all-fonts-link-font-poppins" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-poppins">.font-poppins { font-family: 'Poppins', sans-serif !important; }</style><link id="all-fonts-link-font-playfair" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap"><style id="all-fonts-style-font-playfair">.font-playfair { font-family: 'Playfair Display', serif !important; }</style><link id="all-fonts-link-font-instrument-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-instrument-serif">.font-instrument-serif { font-family: 'Instrument Serif', serif !important; }</style><link id="all-fonts-link-font-merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap"><style id="all-fonts-style-font-merriweather">.font-merriweather { font-family: 'Merriweather', serif !important; }</style><link id="all-fonts-link-font-bricolage" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-bricolage">.font-bricolage { font-family: 'Bricolage Grotesque', sans-serif !important; }</style><link id="all-fonts-link-font-jakarta" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-jakarta">.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif !important; }</style><link id="all-fonts-link-font-manrope" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-manrope">.font-manrope { font-family: 'Manrope', sans-serif !important; }</style><link id="all-fonts-link-font-space-grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-space-grotesk">.font-space-grotesk { font-family: 'Space Grotesk', sans-serif !important; }</style><link id="all-fonts-link-font-work-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-work-sans">.font-work-sans { font-family: 'Work Sans', sans-serif !important; }</style><link id="all-fonts-link-font-pt-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-pt-serif">.font-pt-serif { font-family: 'PT Serif', serif !important; }</style><link id="all-fonts-link-font-geist-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist-mono">.font-geist-mono { font-family: 'Geist Mono', monospace !important; }</style><link id="all-fonts-link-font-space-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-space-mono">.font-space-mono { font-family: 'Space Mono', monospace !important; }</style><link id="all-fonts-link-font-quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-quicksand">.font-quicksand { font-family: 'Quicksand', sans-serif !important; }</style><link id="all-fonts-link-font-nunito" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-nunito">.font-nunito { font-family: 'Nunito', sans-serif !important; }</style>  </head>
+<body class="bg-black text-white antialiased overflow-x-hidden relative">
+
+    <!-- Unicorn / Aura Background -->
+    
+
+
+
+
+
+
+
+<!-- Background (component) added by Aura -->
+<div class="aura-background-component inset-0 pointer-events-none z-0 fixed" data-alpha-mask="80" style="mask-image: linear-gradient(to bottom, transparent, black 0%, black 80%, transparent);
+           -webkit-mask-image: linear-gradient(to bottom, transparent, black 0%, black 80%, transparent);"><div class="aura-background-component top-0 w-full -z-10 absolute h-full">
+  <div data-us-project="FixNvEwvWwbu3QX9qC3F" class="absolute w-full h-full left-0 top-0 -z-10"></div>
+  <script type="text/javascript">
+    !function(){if(!window.UnicornStudio){window.UnicornStudio={isInitialized:!1};var i=document.createElement("script");i.src="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js",i.onload=function(){window.UnicornStudio.isInitialized||(UnicornStudio.init(),window.UnicornStudio.isInitialized=!0)},(document.head || document.body).appendChild(i)}}();
+  </script>
+</div></div>
+
+    <!-- Unicorn script (can sit anywhere in body) -->
+    <script type="text/javascript">
+        !function () {
+      if (!window.UnicornStudio) {
+        window.UnicornStudio = { isInitialized: !1 };
+        var i = document.createElement("script");
+        i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js";
+        i.onload = function () {
+          if (!window.UnicornStudio.isInitialized) {
+            UnicornStudio.init();
+            window.UnicornStudio.isInitialized = !0;
+          }
+        };
+        (document.head || document.body).appendChild(i);
+      }
+    }();
+    </script>
+
+
+    <!-- CUSTOM CURSOR -->
+    <div id="cursor" style="left: 508px; top: 3px;"></div>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-6 transition-transform duration-300" id="navbar">
+        <div class="max-w-[1600px] mx-auto flex items-center justify-between glass rounded-full px-8 py-4">
+            <a href="#" class="flex items-center gap-3 group hover-trigger">
+                <div class="w-8 h-8 bg-white text-black flex items-center justify-center rounded-sm overflow-hidden">
+                    <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                </div>
+                <span class="font-display font-bold tracking-tight text-lg text-white">PULSE<span class="font-light text-neutral-500">BOARD</span></span>
+            </a>
+            <div class="hidden md:flex items-center gap-12">
+                <a href="#work" class="text-xs font-medium uppercase tracking-widest text-neutral-400 hover:text-white transition-colors hover-trigger">Work</a>
+                <a href="#services" class="text-xs font-medium uppercase tracking-widest text-neutral-400 hover:text-white transition-colors hover-trigger">Services</a>
+                <a href="#testimonials" class="text-xs font-medium uppercase tracking-widest text-neutral-400 hover:text-white transition-colors hover-trigger">Stories</a>
+            </div>
+            <button class="bg-white text-black px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-colors hover-trigger">
+                Start Project
+            </button>
+        </div>
+    </nav>
+
+    <!-- SECTION 1: HERO -->
+    <section class="min-h-screen flex flex-col overflow-hidden z-10 pr-6 pl-6 relative items-center justify-center">
+        <!-- Creative Canvas Background -->
+        <canvas id="hero-canvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-40 z-0" width="1778" height="974"></canvas>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#030303] via-transparent to-[#030303]/80 z-0 pointer-events-none"></div>
+
+        <div class="max-w-[1400px] mx-auto text-center relative z-10">
+            <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-12 hover-trigger opacity-0 animate-fade-in" style="opacity: 1;">
+                <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                <span class="text-[10px] font-medium uppercase tracking-[0.2em] text-neutral-300">Global Agency</span>
+            </div>
+
+            <h1 class="font-display text-6xl md:text-8xl lg:text-[7rem] font-medium tracking-tighter text-white leading-[0.95] mb-12 mix-blend-difference">
+                <span class="mask-text"><span class="" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px);">ENGINEERING</span></span>
+                <span class="mask-text"><span class="text-neutral-500" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px);">DIGITAL</span></span>
+                <span class="mask-text"><span class="" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px);">PERFECTION</span></span>
+            </h1>
+
+            <div class="flex flex-col md:flex-row items-center justify-between w-full max-w-4xl mx-auto mt-12 border-t border-white/10 pt-8 opacity-0 animate-fade-up" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px); opacity: 1;">
+                <p class="text-neutral-400 text-sm max-w-xs text-left">
+                    We build high-performance operational systems for forward-thinking brands.
+                </p>
+                <div class="flex gap-12 mt-6 md:mt-0">
+                    <div class="text-left">
+                        <div class="text-2xl font-display font-bold">120+</div>
+                        <div class="text-[10px] uppercase tracking-widest text-neutral-500">Systems Built</div>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-2xl font-display font-bold">$2B+</div>
+                        <div class="text-[10px] uppercase tracking-widest text-neutral-500">Value Generated</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: THE PORTAL (Scroll Expand) -->
+    <section class="relative w-full h-[150vh]" id="work">
+        <div class="pin-spacer" style="order: 0; place-self: auto; grid-row-start: auto; grid-column-start: auto; grid-row-end: auto; grid-column-end: auto; z-index: auto; float: none; flex-shrink: 1; display: flex; margin: 0px; inset: 0px auto auto; position: relative; flex-basis: auto; overflow: visible; box-sizing: border-box; width: 1779px; height: 1948px; padding: 0px 0px 974px;"><div class="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-[#030303]" id="portal-container" style="translate: none; rotate: none; scale: none; inset: 0px auto auto 0px; margin: 0px; max-width: 1778.823486px; width: 1778.823486px; max-height: 974.117615px; height: 974.117615px; padding: 0px; transform: translate(0px, 0px);">
+            <div class="relative w-full h-full flex items-center justify-center">
+                <div class="w-[30%] h-[40%] overflow-hidden relative" id="portal-image" style="height: 40.0033%; width: 29.9966%;">
+                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&amp;w=2670&amp;auto=format&amp;fit=crop" class="absolute inset-0 w-full h-full object-cover grayscale-img" alt="Architecture">
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+                        <h2 class="text-4xl md:text-7xl font-display font-bold text-white tracking-tighter mix-blend-overlay">SELECTEDWORKS</h2>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+    </section>
+
+    <!-- SECTION 3: HORIZONTAL GALLERY -->
+    <div class="pin-spacer" style="order: 0; place-self: auto; grid-row-start: auto; grid-column-start: auto; grid-row-end: auto; grid-column-end: auto; z-index: auto; float: none; flex-shrink: 1; display: block; margin: 0px; inset: 0px; position: relative; flex-basis: auto; overflow: visible; box-sizing: border-box; width: 1779px; height: 1601px; padding: 0px 0px 709px;"><section class="relative bg-[#030303] overflow-hidden" id="horizontal-scroll-section" style="translate: none; rotate: none; scale: none; inset: 0px auto auto 0px; margin: 0px; max-width: 1778.823486px; width: 1778.823486px; max-height: 891.746277px; height: 891.746277px; padding: 0px; transform: translate(0px, 0px);">
+        <div class="py-12 px-6 border-b border-white/10 flex justify-between items-end">
+            <h3 class="text-xs uppercase tracking-[0.3em] text-neutral-500">Featured Case Studies</h3>
+            <span class="text-xs text-white">SCROLL DOWN ↓</span>
+        </div>
+        
+        <div class="flex flex-nowrap h-[80vh] items-center pl-6 md:pl-24 gap-12 md:gap-32 w-max" id="horizontal-track" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px);">
+            <!-- Items -->
+            <div class="group relative w-[80vw] md:w-[40vw] flex-shrink-0 cursor-none view-trigger">
+                <div class="aspect-[16/9] overflow-hidden bg-neutral-900 mb-6 relative">
+                    <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/a906012b-00b9-4610-82f7-f1a6ef3453d0_1600w.jpg" class="w-full h-full object-cover grayscale-img" alt="Project 1">
+                </div>
+                <div class="flex justify-between items-end border-b border-white/10 pb-4">
+                    <div>
+                        <h4 class="text-3xl font-display font-medium text-white">Vanguard Tower</h4>
+                        <p class="text-neutral-500 text-sm mt-1">Real Estate Architecture</p>
+                    </div>
+                    <div class="text-white text-lg font-display">01</div>
+                </div>
+            </div>
+
+            <div class="group relative w-[80vw] md:w-[40vw] flex-shrink-0 cursor-none view-trigger">
+                <div class="aspect-[16/9] overflow-hidden bg-neutral-900 mb-6 relative">
+                    <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/32017361-6e8f-4ec6-a109-c74c79273ec4_1600w.webp" class="w-full h-full object-cover grayscale-img" alt="Project 2">
+                </div>
+                <div class="flex justify-between items-end border-b border-white/10 pb-4">
+                    <div>
+                        <h4 class="text-3xl font-display font-medium text-white">Cyber Systems</h4>
+                        <p class="text-neutral-500 text-sm mt-1">Fintech Dashboard</p>
+                    </div>
+                    <div class="text-white text-lg font-display">02</div>
+                </div>
+            </div>
+
+            <div class="group relative w-[80vw] md:w-[40vw] flex-shrink-0 cursor-none view-trigger pr-24">
+                <div class="aspect-[16/9] overflow-hidden bg-neutral-900 mb-6 relative">
+                    <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/4ca1e73a-69c6-49d2-b4d2-339c3a121dda_1600w.webp" class="w-full h-full object-cover grayscale-img" alt="Project 3">
+                </div>
+                <div class="flex justify-between items-end border-b border-white/10 pb-4">
+                    <div>
+                        <h4 class="text-3xl font-display font-medium text-white">Orbital Labs</h4>
+                        <p class="text-neutral-500 text-sm mt-1">Space Tech Interface</p>
+                    </div>
+                    <div class="text-white text-lg font-display">03</div>
+                </div>
+            </div>
+        </div>
+    </section></div>
+
+    <!-- SECTION 4: 3D SERVICES -->
+    <section class="py-40 px-6 relative z-10 bg-[#050509] border-t border-white/5" id="services">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-24">
+                <div class="sticky top-32 h-fit">
+                    <h2 class="text-6xl font-display font-medium text-white mb-8">Our <br>Expertise</h2>
+                    <p class="text-neutral-400 text-lg max-w-md mb-12">
+                        We don't just design; we engineer outcomes. Our methodology combines rigorous data analysis with world-class aesthetic execution.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-4 text-white">
+                            <span class="h-[1px] w-8 bg-white"></span> System Architecture
+                        </li>
+                        <li class="flex items-center gap-4 text-neutral-500">
+                            <span class="h-[1px] w-8 bg-neutral-800"></span> UI/UX Design
+                        </li>
+                        <li class="flex items-center gap-4 text-neutral-500">
+                            <span class="h-[1px] w-8 bg-neutral-800"></span> Full-Stack Development
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="flex flex-col gap-12">
+                    
+                    <!-- Service Card 1: STRATEGY -->
+                    <div class="card-3d-wrap group h-[450px] w-full cursor-pointer hover-trigger">
+                        <div class="card-3d-inner relative w-full h-full bg-[#0a0a0a] border border-white/10 rounded-2xl p-10 flex flex-col justify-between shadow-2xl overflow-hidden bg-noise">
+                            <!-- Background Grid -->
+                            <div class="absolute inset-0" style="background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 20px 20px;"></div>
+                            
+                            <!-- THE DETAILED VISUAL: Abstract Schematic -->
+                            <div class="card-element relative w-full h-64 border border-white/10 bg-[#0f0f0f]/80 backdrop-blur-sm rounded-xl overflow-hidden mb-6 flex items-center justify-center">
+                                <!-- Scanning Line -->
+                                <div class="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/50 to-transparent z-20 animate-scan"></div>
+                                
+                                <!-- Central Node -->
+                                <div class="absolute w-24 h-24 border border-white/10 rounded-full flex items-center justify-center z-10">
+                                    <div class="w-16 h-16 border border-white/20 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
+                                        <div class="w-2 h-2 bg-white rounded-full"></div>
+                                    </div>
+                                    <div class="absolute w-2 h-2 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.8)]"></div>
+                                </div>
+
+                                <!-- Connecting Lines (SVG) -->
+                                <svg class="absolute inset-0 w-full h-full opacity-30 pointer-events-none">
+                                    <line x1="50%" y1="50%" x2="20%" y2="30%" stroke="white" stroke-width="1"></line>
+                                    <line x1="50%" y1="50%" x2="80%" y2="30%" stroke="white" stroke-width="1"></line>
+                                    <line x1="50%" y1="50%" x2="50%" y2="80%" stroke="white" stroke-width="1"></line>
+                                    
+                                    <!-- Orbiting Nodes -->
+                                    <circle cx="20%" cy="30%" r="3" fill="white" class="animate-pulse"></circle>
+                                    <circle cx="80%" cy="30%" r="3" fill="white" class="animate-pulse" style="animation-delay: 0.5s"></circle>
+                                    <circle cx="50%" cy="80%" r="3" fill="white" class="animate-pulse" style="animation-delay: 1s"></circle>
+                                </svg>
+                                
+                                <!-- Data Label -->
+                                <div class="absolute bottom-3 left-4 text-[9px] font-mono text-neutral-500 uppercase tracking-widest">
+                                    System Status: ActiveNodes: 3/3
+                                </div>
+                            </div>
+                            
+                            <!-- Card Text -->
+                            <div class="card-element relative z-10">
+                                <h3 class="text-3xl font-display font-medium text-white mb-2">Strategy &amp; Architecture</h3>
+                                <p class="text-neutral-500 max-w-sm">Technical discovery, data modeling, and infrastructure roadmap planning.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Service Card 2: DEVELOPMENT -->
+                    <div class="card-3d-wrap group h-[450px] w-full cursor-pointer hover-trigger">
+                        <div class="card-3d-inner relative w-full h-full bg-[#0a0a0a] border border-white/10 rounded-2xl p-10 flex flex-col justify-between shadow-2xl overflow-hidden bg-noise">
+                            <!-- Background Grid -->
+                            <div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 100% 40px;"></div>
+
+                            <!-- THE DETAILED VISUAL: Deconstructed Terminal -->
+                            <div class="card-element relative w-full h-64 mb-6 perspective-1000">
+                                <!-- Layer 3: Background decoration -->
+                                <div class="absolute top-10 left-10 w-[80%] h-40 border border-white/5 bg-white/[0.02] rounded-lg -z-10 transform translate-x-4 translate-y-4"></div>
+                                
+                                <!-- Layer 2: Main Terminal Window -->
+                                <div class="absolute inset-0 w-[90%] h-52 bg-[#050505] border border-white/10 rounded-xl mx-auto shadow-2xl overflow-hidden transform transition-transform group-hover:-translate-y-2">
+                                    <!-- Window Controls -->
+                                    <div class="h-8 border-b border-white/5 bg-white/[0.03] flex items-center px-3 gap-1.5">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-neutral-600"></div>
+                                        <div class="w-2.5 h-2.5 rounded-full bg-neutral-700"></div>
+                                        <div class="w-2.5 h-2.5 rounded-full bg-neutral-700"></div>
+                                    </div>
+                                    <!-- Code Content -->
+                                    <div class="p-4 font-mono text-[10px] text-neutral-400 space-y-2">
+                                        <div class="flex gap-2">
+                                            <span class="text-purple-400">const</span>
+                                            <span class="text-blue-400">initSystem</span>
+                                            <span class="text-white">=</span>
+                                            <span class="text-yellow-300">async</span>
+                                            <span class="text-white">() =&gt; {</span>
+                                        </div>
+                                        <div class="pl-4 flex gap-2">
+                                            <span class="text-purple-400">await</span>
+                                            <span class="text-white">db.connect(</span>
+                                            <span class="text-green-400">'pulse_v2'</span>
+                                            <span class="text-white">);</span>
+                                        </div>
+                                        <div class="pl-4 flex gap-2 items-center">
+                                            <span class="text-neutral-500">// Deploying modules...</span>
+                                        </div>
+                                        <div class="pl-4 bg-white/10 h-3 rounded w-0 animate-type"></div>
+                                        <div class="text-white">}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Layer 1: Floating Badge -->
+                                <div class="absolute -bottom-2 -right-2 bg-white text-black px-4 py-2 rounded-lg text-xs font-bold shadow-[0_10px_20px_rgba(0,0,0,0.5)] transform rotate-[-5deg] group-hover:rotate-0 transition-transform">
+                                    v2.0.4 Ready
+                                </div>
+                            </div>
+                            
+                            <!-- Card Text -->
+                            <div class="card-element relative z-10">
+                                <h3 class="text-3xl font-display font-medium text-white mb-2">Development</h3>
+                                <p class="text-neutral-500 max-w-sm">Next-js, WebGL, and scalable backend systems built for speed.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: FLOATING PARALLAX TESTIMONIALS -->
+    <section class="py-32 px-6 bg-black relative border-t border-white/10 overflow-hidden" id="testimonials">
+        <div class="max-w-[1400px] mx-auto relative z-10">
+            <div class="text-center mb-24">
+                <h2 class="text-4xl md:text-6xl font-display font-medium text-white mb-6">Voices of Industry</h2>
+                <p class="text-neutral-500 uppercase tracking-widest text-xs">Trusted by leaders worldwide</p>
+            </div>
+
+            <!-- The Grid Container -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 h-[800px] overflow-hidden relative fade-mask">
+                <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent z-20 pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-20 pointer-events-none"></div>
+
+                <!-- Column 1 -->
+                <div class="flex flex-col gap-8 testimonial-col" data-speed="0.5" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px);">
+                    <div class="bg-[#0a0a0a] border border-white/5 p-8 rounded-2xl transition-all duration-300 hover:border-white/30 group hover-trigger">
+                        <p class="text-lg text-neutral-300 font-light mb-6 leading-relaxed">"PulseBoard transformed our fragmented workflow into a singular source of truth. The ROI was immediate."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-neutral-800 rounded-full overflow-hidden grayscale-img">
+                                <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/2dbcdf02-39a2-4c13-95f7-3118cc995fa0_320w.webp" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <div class="text-white text-sm font-medium">David Chen</div>
+                                <div class="text-neutral-600 text-xs uppercase tracking-wider">CTO, Nexus</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-[#0a0a0a] border border-white/5 p-8 rounded-2xl transition-all duration-300 hover:border-white/30 group hover-trigger">
+                        <p class="text-lg text-neutral-300 font-light mb-6 leading-relaxed">"Elegant, fast, and incredibly robust. It feels like software from the future."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-neutral-800 rounded-full overflow-hidden grayscale-img">
+                                <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/90ec73f0-6fd3-4d0c-922c-fcc592c983df_320w.webp" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <div class="text-white text-sm font-medium">Sarah Miller</div>
+                                <div class="text-neutral-600 text-xs uppercase tracking-wider">VP Design, Stripe</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="flex flex-col gap-8 testimonial-col -mt-24" data-speed="-0.8" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px);">
+                    <div class="bg-[#0a0a0a] border border-white/5 p-8 rounded-2xl transition-all duration-300 hover:border-white/30 group hover-trigger">
+                        <p class="text-lg text-neutral-300 font-light mb-6 leading-relaxed">"Finally, an agency that understands that code quality is just as important as visual aesthetics."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-neutral-800 rounded-full overflow-hidden grayscale-img">
+                                <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/83a1ae5f-c842-4ee9-a912-505fc66a1ee0_320w.webp" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <div class="text-white text-sm font-medium">Elena K.</div>
+                                <div class="text-neutral-600 text-xs uppercase tracking-wider">Product Lead, Linear</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-[#0a0a0a] border border-white/5 p-8 rounded-2xl transition-all duration-300 hover:border-white/30 group hover-trigger">
+                        <p class="text-lg text-neutral-300 font-light mb-6 leading-relaxed">"Scaling our infrastructure was a nightmare until PulseBoard stepped in. Flawless execution."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-neutral-800 rounded-full overflow-hidden grayscale-img">
+                                <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/39e15168-9f77-4837-9a4b-89c74b8bc38b_320w.webp" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <div class="text-white text-sm font-medium">Tom Hiddleston</div>
+                                <div class="text-neutral-600 text-xs uppercase tracking-wider">CEO, Vercel</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="flex flex-col gap-8 testimonial-col" data-speed="0.6" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px);">
+                    <div class="bg-[#0a0a0a] border border-white/5 p-8 rounded-2xl transition-all duration-300 hover:border-white/30 group hover-trigger">
+                        <p class="text-lg text-neutral-300 font-light mb-6 leading-relaxed">"We needed a partner who could handle complexity. PulseBoard delivered simplicity through complexity."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-neutral-800 rounded-full overflow-hidden grayscale-img">
+                                <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/c92852bb-a510-405a-85ab-ffa0fde136a4_320w.jpg" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <div class="text-white text-sm font-medium">James O.</div>
+                                <div class="text-neutral-600 text-xs uppercase tracking-wider">Head of Eng, Uber</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW FOOTER SECTION -->
+    <footer class="relative overflow-hidden bg-[#050509] border-t border-white/5 pt-24 pb-12">
+        <!-- 1. Gradient Top Border -->
+        <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50"></div>
+
+        <!-- 2. Gray Glow (Top Middle) -->
+        <div class="absolute -top-[150px] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-white/5 blur-[80px] rounded-full pointer-events-none mix-blend-screen"></div>
+
+        <div class="max-w-[1400px] mx-auto px-6 relative z-10">
+            <!-- Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-20">
+                <!-- Column 1: Brand -->
+                <div class="lg:col-span-1 space-y-6">
+                    <a href="#" class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-white text-black flex items-center justify-center rounded-sm overflow-hidden">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                            </svg>
+                        </div>
+                        <span class="font-display font-bold tracking-tight text-lg text-white">PULSE<span class="font-light text-neutral-500">BOARD</span></span>
+                    </a>
+                    <p class="text-neutral-400 text-sm leading-relaxed max-w-xs">
+                        Engineering the digital nervous system for global brands. London, New York, Tokyo.
+                    </p>
+                </div>
+
+                <!-- Column 2: Links -->
+                <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h4 class="text-white text-xs font-bold uppercase tracking-widest mb-6">Explore</h4>
+                        <ul class="space-y-4 text-sm text-neutral-500">
+                            <li><a href="#" class="hover:text-white transition-colors">Work</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Services</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Process</a></li>
+                            
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-white text-xs font-bold uppercase tracking-widest mb-6">Company</h4>
+                        <ul class="space-y-4 text-sm text-neutral-500">
+                            <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">News</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-white text-xs font-bold uppercase tracking-widest mb-6">Socials</h4>
+                        <ul class="space-y-4 text-sm text-neutral-500">
+                            <li><a href="#" class="hover:text-white transition-colors">Twitter / X</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">LinkedIn</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Instagram</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Column 3: Newsletter -->
+                <div class="lg:col-span-1">
+                    <h4 class="text-white text-xs font-bold uppercase tracking-widest mb-6">Stay Updated</h4>
+                    <div class="relative">
+                        <input type="email" placeholder="Email address" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-white/30 transition-colors">
+                        <button class="absolute right-2 top-2 p-1 bg-white text-black rounded hover:bg-neutral-200 transition-colors">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-[10px] text-neutral-600 uppercase tracking-widest">
+                    © 2024 PulseBoard Agency. All Rights Reserved.
+                </div>
+                <div class="flex gap-6 text-[10px] text-neutral-600 uppercase tracking-widest">
+                    <a href="#" class="hover:text-neutral-400 transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-neutral-400 transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        // 1. LIGHTER SMOOTH SCROLL CONFIG
+        const lenis = new Lenis({
+            duration: 0.8,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            gestureDirection: 'vertical',
+            smooth: true,
+            mouseMultiplier: 0.8,
+            smoothTouch: false,
+            touchMultiplier: 2,
+        })
+
+        function raf(time) {
+            lenis.raf(time)
+            requestAnimationFrame(raf)
+        }
+        requestAnimationFrame(raf)
+
+        // Connect GSAP to Lenis
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // 2. Custom Cursor Logic
+        const cursor = document.getElementById('cursor');
+        const hoverTriggers = document.querySelectorAll('.hover-trigger');
+        const viewTriggers = document.querySelectorAll('.view-trigger');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        hoverTriggers.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        viewTriggers.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('view-cursor'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('view-cursor'));
+        });
+
+        // 3. CANVAS ANIMATION
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let streams = [];
+        const gap = 40; 
+
+        class Stream {
+            constructor(x) {
+                this.x = x;
+                this.y = Math.random() * height;
+                this.speed = Math.random() * 2 + 0.5;
+                this.length = Math.random() * 100 + 50;
+                this.opacity = Math.random() * 0.3 + 0.05;
+            }
+            update(mouseY) {
+                this.y -= this.speed;
+                if (this.y + this.length < 0) {
+                    this.y = height + Math.random() * 100;
+                    this.speed = Math.random() * 2 + 0.5;
+                }
+            }
+            draw(ctx) {
+                ctx.strokeStyle = `rgba(255, 255, 255, 0.03)`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(this.x, 0);
+                ctx.lineTo(this.x, height);
+                ctx.stroke();
+
+                const gradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.length);
+                gradient.addColorStop(0, `rgba(255, 255, 255, 0)`);
+                gradient.addColorStop(0.5, `rgba(255, 255, 255, ${this.opacity})`);
+                gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(this.x - 1, this.y, 3, this.length);
+            }
+        }
+
+        function initCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            streams = [];
+            for (let x = gap / 2; x < width; x += gap) {
+                streams.push(new Stream(x));
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            streams.forEach(s => {
+                s.update();
+                s.draw(ctx);
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        animateCanvas();
+
+        // 4. Hero Text Mask Animation
+        const headings = document.querySelectorAll('.mask-text span');
+        headings.forEach((h, i) => {
+            gsap.to(h, {
+                y: 0,
+                duration: 1.2,
+                ease: "power3.out",
+                delay: i * 0.1
+            });
+        });
+
+        gsap.to(".animate-fade-in", { opacity: 1, duration: 1, delay: 0.5 });
+        gsap.to(".animate-fade-up", { opacity: 1, y: 0, duration: 1, delay: 0.8, ease: "power2.out" });
+
+        // 5. The Portal Animation
+        const tlPortal = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#portal-container",
+                start: "top top",
+                end: "+=100%", 
+                scrub: true,
+                pin: true,
+            }
+        });
+
+        tlPortal.to("#portal-image", {
+            width: "100%",
+            height: "100%",
+            ease: "none"
+        });
+
+        // 6. Horizontal Scroll
+        const horizontalSection = document.getElementById('horizontal-scroll-section');
+        const horizontalTrack = document.getElementById('horizontal-track');
+        let scrollAmount = horizontalTrack.scrollWidth - window.innerWidth;
+
+        gsap.to(horizontalTrack, {
+            x: -scrollAmount,
+            ease: "none",
+            scrollTrigger: {
+                trigger: horizontalSection,
+                start: "top top",
+                end: () => `+=${scrollAmount}`,
+                pin: true,
+                scrub: 1,
+                invalidateOnRefresh: true,
+            }
+        });
+
+        // 7. Testimonial Parallax
+        const testimonialSection = document.querySelector('#testimonials');
+        const cols = document.querySelectorAll('.testimonial-col');
+
+        cols.forEach((col) => {
+            const speed = col.dataset.speed;
+            gsap.to(col, {
+                y: () => (speed * 100), 
+                ease: "none",
+                scrollTrigger: {
+                    trigger: testimonialSection,
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+        });
+
+        // 8. 3D Card Tilt
+        const cards3d = document.querySelectorAll('.card-3d-wrap');
+        cards3d.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -10;
+                const rotateY = ((x - centerX) / centerX) * 10;
+
+                const inner = card.querySelector('.card-3d-inner');
+                inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                const inner = card.querySelector('.card-3d-inner');
+                inner.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            });
+        });
+
+    </script>
+
+</body></html>

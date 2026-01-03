@@ -1,0 +1,125 @@
+.hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 700px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    /* Vertically center content? Or top aligned? Prompt says "Left third: calmer negative space... dark-to-transparent overlay" */
+    /* Actually, content block usually centered vertically or slightly lower. */
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120%;
+    /* For parallax */
+    background-color: #1a1a1a;
+    z-index: 0;
+}
+
+.hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.hero-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background-image: url('/assets/hero_mist.png');
+    background-size: cover;
+    background-position: center;
+    /* Ensure the image covers well. If the image is landscape, center is good. */
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%);
+    z-index: 5;
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+}
+
+.hero-text-block {
+    max-width: 600px;
+    color: var(--color-text);
+}
+
+.kicker {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    /* JS Animation initial state */
+}
+
+.hero-title {
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1.1;
+    margin-bottom: 2rem;
+    color: #fff;
+    opacity: 0;
+    /* JS Animation initial state */
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    /* Ensure legibility under mist */
+}
+
+.subline {
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 400px;
+    margin-bottom: 3rem;
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    /* JS Animation initial state */
+}
+
+.cta-wrapper {
+    opacity: 0;
+    /* JS Animation initial state */
+}
+
+.primary-cta {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background-color: var(--color-accent);
+    color: #000;
+    font-weight: 500;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.primary-cta:hover {
+    transform: translateY(-2px);
+    background-color: #e5c045;
+}
+
+.microline {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.05em;
+}

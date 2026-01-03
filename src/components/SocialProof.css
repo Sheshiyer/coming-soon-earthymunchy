@@ -1,0 +1,61 @@
+.social-proof-section {
+    padding: 6rem 0;
+    background-color: var(--color-bg);
+    position: relative;
+    z-index: 5;
+}
+
+.proof-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.proof-card {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px;
+    opacity: 0;
+    /* Animation init */
+}
+
+.proof-quote {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    color: var(--color-text);
+    margin-bottom: 2rem;
+    line-height: 1.4;
+}
+
+.proof-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+}
+
+.proof-author {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.proof-detail {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+}
+
+@media (max-width: 768px) {
+    .proof-grid {
+        grid-template-columns: 1fr;
+    }
+}

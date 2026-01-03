@@ -1,0 +1,104 @@
+.fs-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--color-bg);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+.fs-menu-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    padding-top: 4rem;
+}
+
+.fs-close-btn {
+    position: absolute;
+    top: 2rem;
+    right: var(--spacing-container);
+    /* Match container padding */
+    font-size: 1.5rem;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.fs-close-btn:hover {
+    transform: rotate(90deg);
+}
+
+.fs-nav-list {
+    list-style: none;
+    margin-bottom: 4rem;
+}
+
+.fs-nav-item {
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.fs-nav-link {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.fs-nav-link:hover {
+    color: var(--color-accent);
+    transform: translateX(10px);
+}
+
+.fs-socials {
+    margin-top: auto;
+    margin-bottom: 2rem;
+}
+
+.fs-social-label {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+}
+
+.fs-social-icon {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 2rem;
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.fs-social-icon:hover {
+    color: var(--color-accent);
+}
+
+.fs-social-text {
+    font-size: 1rem;
+    font-family: var(--font-sans);
+    font-weight: 500;
+}
+
+.fs-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+    margin-bottom: 2rem;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
