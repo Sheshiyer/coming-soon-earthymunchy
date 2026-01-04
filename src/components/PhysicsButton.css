@@ -13,4 +13,5 @@
     /* Reset default button styles */
     appearance: none;
     -webkit-appearance: none;
+    border-radius: 15px;
 }

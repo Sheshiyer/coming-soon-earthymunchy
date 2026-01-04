@@ -6,8 +6,182 @@
     overflow: hidden;
     display: flex;
     align-items: center;
-    /* Vertically center content? Or top aligned? Prompt says "Left third: calmer negative space... dark-to-transparent overlay" */
-    /* Actually, content block usually centered vertically or slightly lower. */
+    justify-content: center;
+    /* Ensure flex centering */
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120%;
+    /* For parallax */
+    background-color: #1a1a1a;
+    z-index: 0;
+}
+
+.hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.hero-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background-image: url('/assets/hero_mist.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Darker overlay for better text contrast */
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%);
+    z-index: 5;
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 var(--spacing-container);
+}
+
+.hero-text-block {
+    max-width: 1000px;
+    /* Increased max-width */
+    color: var(--color-text);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.kicker {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2rem;
+    opacity: 0;
+    /* Will be handled by GSAP autoAlpha */
+    visibility: hidden;
+}
+
+.hero-title {
+    /* Large, impactful typography */
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    line-height: 1.05;
+    margin-bottom: 2.5rem;
+    color: #fff;
+    opacity: 0;
+    visibility: hidden;
+    /* Will be handled by GSAP autoAlpha */
+    font-weight: 400;
+    /* Sophisticated serif look */
+    letter-spacing: -0.02em;
+}
+
+.subline {
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.6;
+    max-width: 500px;
+    margin-bottom: 3.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    opacity: 0;
+    visibility: hidden;
+    font-weight: 300;
+}
+
+.cta-wrapper {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.primary-cta {
+    display: inline-block;
+    padding: 1.2rem 3rem;
+    background-color: var(--color-accent);
+    color: #0d0d0d;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.primary-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+    background-color: #e5c045;
+}
+
+.microline {
+    margin-top: 1.5rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+/* Breakpoints */
+
+@media (max-width: 1200px) {
+    .hero-title {
+        font-size: 5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content {
+        padding: 0 1.5rem;
+    }
+
+    .hero-title {
+        font-size: 3.2rem;
+        /* Adjusted for mobile readability */
+        margin-bottom: 2rem;
+    }
+
+    .kicker {
+        font-size: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .subline {
+        font-size: 1rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .physics-btn {
+        padding: 1rem 2.5rem;
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
 }
 
 .hero-bg {
@@ -55,11 +229,19 @@
     z-index: 10;
     width: 100%;
     display: flex;
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    text-align: center;
+    /* Center text inside */
+    height: 100%;
 }
 
 .hero-text-block {
-    max-width: 600px;
+    max-width: 800px;
     color: var(--color-text);
+    margin: 0 auto;
 }
 
 .kicker {
@@ -118,8 +300,55 @@
 }
 
 .microline {
-    margin-top: 1rem;
-    font-size: 0.75rem;
     color: var(--color-text-muted);
     letter-spacing: 0.05em;
+}
+
+/* Breakpoints */
+
+/* 2. Laptops / Small Desktops (max-width: 1200px) */
+@media (max-width: 1200px) {
+    .hero-title {
+        font-size: 4.5rem;
+    }
+}
+
+/* 3. Tablets Landscape (max-width: 992px) */
+@media (max-width: 992px) {
+    .hero-title {
+        font-size: 3.5rem;
+    }
+
+    .subline {
+        font-size: 1rem;
+        max-width: 100%;
+        padding: 0 2rem;
+    }
+}
+
+/* 4. Tablets Portrait (max-width: 768px) */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.8rem;
+    }
+
+    .kicker {
+        font-size: 0.75rem;
+    }
+}
+
+/* 5. Mobile (max-width: 576px) */
+@media (max-width: 576px) {
+    .hero-title {
+        font-size: 2.2rem;
+    }
+
+    .subline {
+        font-size: 0.9rem;
+    }
+
+    .physics-btn {
+        padding: 0.8rem 2rem;
+        font-size: 0.9rem;
+    }
 }

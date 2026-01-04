@@ -13,18 +13,37 @@
     align-items: center;
 }
 
-.logo-wrapper {
-    width: 120px;
-    /* If using an img tag, we might want to invert it if it's black on white, or just use filter. */
-    /* Assuming the logo is an image, we might need a mix-blend-mode or filter depending on the logo */
+
+
+.brand-logo-text {
+    font-family: var(--font-sans);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 0.05em;
+    font-weight: 700;
 }
 
-.brand-logo {
-    width: 100%;
-    height: auto;
-    display: block;
-    filter: invert(1);
-    /* Invert black logo to white for dark theme */
+.logo-earthy {
+    font-weight: 900;
+    /* Extra bold for EARTHY */
+}
+
+.logo-munchy {
+    font-weight: 700;
+    /* Bold for MUNCHY */
+}
+
+/* Responsive adjustments for Header */
+@media (max-width: 768px) {
+    .site-header {
+        padding: 1.5rem 0;
+    }
+
+    .brand-logo-text {
+        font-size: 1.25rem;
+    }
 }
 
 .menu-btn {
