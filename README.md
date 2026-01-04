@@ -11,7 +11,7 @@ This repository contains the "Coming Soon" landing page for Earthy Munchy. We ar
 - **Matrix Canvas Overlay**: A subtle data-stream animation representing the "pure source" origin.
 - **Fluid Typography**: Responsive, majestic headlines that scale perfectly from 4rem to 9rem using `clamp()`.
 - **Micro-Interactions**: Custom magnetic cursor, staggered text reveals, skew effects on hover, and an animated "Instagram DM" CTA.
-- **Performance**: Smooth scrolling via `@studio-freight/lenis` and GSAP-powered animations.
+- **Performance**: Smooth scrolling via `lenis` and GSAP-powered animations.
 - **SEO Ready**: Optimized meta tags for "Wild by Origin" branding.
 
 ## Tech Stack
