@@ -100,7 +100,8 @@
     /* Large, impactful typography */
     font-size: clamp(3.5rem, 8vw, 7rem);
     line-height: 1.05;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5em;
+    /* Increased spacing as requested */
     color: #fff;
     opacity: 0;
     visibility: hidden;
@@ -114,12 +115,16 @@
     font-family: var(--font-sans);
     font-size: clamp(1rem, 2vw, 1.25rem);
     line-height: 1.6;
-    max-width: 500px;
+    max-width: 800px;
+    /* Increased width to spread text out */
     margin-bottom: 3.5rem;
     color: rgba(255, 255, 255, 0.9);
     opacity: 0;
     visibility: hidden;
     font-weight: 300;
+    padding: 0 1.5em;
+    margin-top: 2em;
+    /* Maintained padding from previous request */
 }
 
 .cta-wrapper {
@@ -507,7 +512,8 @@
     .subline {
         font-size: 1rem;
         max-width: 100%;
-        padding: 0 2rem;
+        padding: 0 1.5em;
+        /* Updated to match 1.5em request */
     }
 }
 
