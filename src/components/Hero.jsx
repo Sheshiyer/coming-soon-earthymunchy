@@ -3,6 +3,7 @@ import gsap from 'gsap';
 
 import PhysicsButton from './PhysicsButton';
 import './Hero.css';
+import logoWhite from '../assets/logo-white.png';
 import heroVideo from '../assets/hero-bg.mp4';
 
 const Hero = () => {
@@ -24,11 +25,14 @@ const Hero = () => {
             const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
             // Initial Set for visibility
-            gsap.set(['.kicker', '.hero-title', '.subline', '.cta-wrapper'], { autoAlpha: 0, y: 30 });
+            gsap.set(['.hero-logo', '.kicker', '.hero-title', '.subline', '.cta-wrapper'], { autoAlpha: 0, y: 30 });
             gsap.set('.hero-char span', { autoAlpha: 0, y: 40 });
 
-            // Animate Kicker first
-            tl.to('.kicker', { autoAlpha: 1, y: 0, duration: 1, delay: 0.2 });
+            // Animate Logo first
+            tl.to('.hero-logo', { autoAlpha: 1, y: 0, duration: 1, delay: 0.2 });
+
+            // Animate Kicker
+            tl.to('.kicker', { autoAlpha: 1, y: 0, duration: 1 }, "-=0.5");
 
             // Animate Title Chars (Staggered and elegant)
             tl.to('.hero-title', { autoAlpha: 1, duration: 0.1 }, "-=0.8"); // Ensure container is visible
@@ -93,6 +97,7 @@ const Hero = () => {
 
             <div className="container hero-content">
                 <div className="hero-text-block">
+                    <img src={logoWhite} alt="Earthy Munchy Logo" className="hero-logo" />
                     <p className="kicker">Sri Lanka • A Land of Purity</p>
                     <h1 className="hero-title hero-char">
                         {splitText("Wild by Origin.")}<br />
@@ -103,7 +108,9 @@ const Hero = () => {
                         Sourced from authentic origins, sealed at the source.
                     </p>
                     <div className="cta-wrapper">
-                        <PhysicsButton className="primary-cta">Join the Journey</PhysicsButton>
+                        <a href="https://www.instagram.com/earthy.munchy?igsh=azAzMXR1OW1wZXRr" target="_blank" rel="noopener noreferrer">
+                            <PhysicsButton className="primary-cta">Join the Journey</PhysicsButton>
+                        </a>
                         <p className="microline">Est. 2025 • Sri Lanka & India</p>
                     </div>
                 </div>
